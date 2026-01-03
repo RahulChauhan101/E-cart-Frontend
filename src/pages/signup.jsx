@@ -71,7 +71,7 @@ const Signup = () => {
         autoClose: 3000,
       });
 
-      navigate("/login");
+      navigate("/verify");
     } catch (error) {
       console.error("API ERROR 👉", error);
 
