@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
+  import { UserPlus } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -109,7 +110,7 @@ const Login = () => {
             </div>
 
             {/* Login Button */}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="bg-gradient-to-r from-purple-500 to-pink-300 w-full" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -123,22 +124,32 @@ const Login = () => {
         </CardContent>
 
         {/* Signup Link */}
-        <CardFooter>
-          <Button variant="outline" className="w-full group" asChild>
-            <Link
-              to="/signup"
-              className="flex justify-center items-center gap-1
-                         text-sm text-600
-                         transition transform duration-200
-                         group-hover:text-purple-800
-                         hover:underline hover:scale-110"
-            >
-              Don&apos;t have an account?
-              <span className="font-medium text-purple-400 hover:underline 
-              hover:text-purple-600 ">Signup</span>
-            </Link>
-          </Button>
-        </CardFooter>
+
+
+<CardFooter>
+  <Button variant="outline" className="w-full group" asChild>
+    <Link
+      to="/signup"
+      className="flex justify-center items-center gap-1
+                 text-sm text-gray-600
+                 transition-colors duration-200
+                 group-hover:text-purple-800"
+    >
+      Don&apos;t have an account?
+
+      <span
+        className="ml-1 inline-flex items-center gap-1
+                   font-medium text-purple-400
+                   transition-transform duration-300 ease-in-out
+                   hover:scale-125 hover:text-purple-600 hover:underline"
+      >
+        <UserPlus size={16} />
+        Signup
+      </span>
+    </Link>
+  </Button>
+</CardFooter>
+
       </Card>
     </div>
   );

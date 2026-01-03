@@ -99,7 +99,7 @@ const Signup = () => {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={submitHandler} className="space-y-4">
+          
             {/* First & Last Name */}
             <div className="grid grid-cols-2 gap-4">
               <div className="grid gap-2">
@@ -126,7 +126,7 @@ const Signup = () => {
             </div>
 
             {/* Email */}
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-2">
               <Label>Email</Label>
               <Input
                 type="email"
@@ -139,9 +139,9 @@ const Signup = () => {
             </div>
 
             {/* Password */}
-            <div className="grid gap-2">
+            <div className="grid gap-2 pt-2">
               <Label>Password</Label>
-              <div className="relative">
+              <div className="relative ">
                 <Input
                   type={showPassword ? "text" : "password"}
                   name="password"
@@ -161,25 +161,41 @@ const Signup = () => {
             </div>
 
             {/* Signup Button */}
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button  onClick={submitHandler} type="submit" className="bg-gradient-to-r from-purple-500 to-pink-300 hover:from-pink-500 hover:to-yellow-500  w-full mt-4 " disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Creating account...
                 </>
               ) : (
-                "Sign Up"
+                " Sign Up"
               )}
             </Button>
-          </form>
+          
         </CardContent>
 
         {/* Login link */}
-        <CardFooter>
-          <Button variant="outline" className="w-full" asChild>
-            <Link to="/login">Already have an account? Login</Link>
-          </Button>
-        </CardFooter>
+<CardFooter>
+  <Button
+    variant="outline"
+    className="text-white bg-gradient-to-r from-purple-500 to-pink-300
+               hover:from-pink-500 hover:to-yellow-500
+               w-full hover:text-white"
+    asChild
+  >
+    <Link to="/login" className="flex justify-center items-center">
+      Already have an account?
+      <span
+        className="ml-2 inline-block
+                   transition-transform duration-300
+                   hover:scale-125 hover:underline font-semibold"
+      >
+        Login
+      </span>
+    </Link>
+  </Button>
+</CardFooter>
+
       </Card>
     </div>
   );
