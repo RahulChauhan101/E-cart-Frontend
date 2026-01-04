@@ -5,6 +5,8 @@ import Signup from "./pages/signup";
 import Login from "./pages/Login";
 import Verify from "./pages/Verify";
 import VerifyEmail from "./pages/VerifyEmail";
+import Footer from "./components/Footer";
+import Profile from "./pages/Profile";
 
 const router = createBrowserRouter([
   {
@@ -13,6 +15,7 @@ const router = createBrowserRouter([
       <>
         <Navbar />
         <Home />
+        <Footer/>
       </>
     ),
   },
@@ -20,6 +23,7 @@ const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
   { path: "/verify", element: <Verify /> },
   { path: "/verify/:token", element: <VerifyEmail /> },
+  { path: "/profile", element:<><Profile /> </>},
 ]);
 
 function App() {

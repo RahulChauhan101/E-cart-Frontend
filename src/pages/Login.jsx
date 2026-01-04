@@ -14,9 +14,13 @@ import { Eye, EyeOff, Loader2, UserPlus } from "lucide-react";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "@/redux/userSlice";
 
 const Login = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
@@ -38,23 +42,31 @@ const Login = () => {
       const res = await axios.post(
         "http://localhost:5000/api/users/login",
         formData,
-        { headers: { "Content-Type": "application/json" } }
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
       );
 
-      if (res.data.success) {
-        localStorage.setItem("token", res.data.token);
+if (res.data.success) {
+  dispatch(
+    loginSuccess({
+      user: res.data.user,                 // ✅ object
+      accessToken: res.data.accessToken,   // ✅ correct key
+      refreshToken: res.data.refreshToken,
+    })
+  );
 
-        toast.update(toastId, {
-          render: "Login successful 🎉",
-          type: "success",
-          isLoading: false,
-          autoClose: 2000,
-        });
+  toast.update(toastId, {
+    render: "Login successful 🎉",
+    type: "success",
+    isLoading: false,
+    autoClose: 2000,
+  });
 
-        navigate("/"); // ✅ WORKS
-      } else {
-        throw new Error();
-      }
+  navigate("/");
+}
     } catch (err) {
       toast.update(toastId, {
         render: err.response?.data?.message || "Login failed ❌",
@@ -79,6 +91,7 @@ const Login = () => {
 
         <CardContent>
           <form onSubmit={submitHandler} className="space-y-4">
+            {/* Email */}
             <div>
               <Label>Email</Label>
               <Input
@@ -90,6 +103,7 @@ const Login = () => {
               />
             </div>
 
+            {/* Password */}
             <div>
               <Label>Password</Label>
               <div className="relative">
@@ -102,14 +116,15 @@ const Login = () => {
                 />
                 <button
                   type="button"
-                  className="absolute right-3 top-2.5"
+                  className="absolute right-3 top-2.5 text-gray-500"
                   onClick={() => setShowPassword(!showPassword)}
                 >
-                  {showPassword ? <EyeOff /> : <Eye />}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
             </div>
 
+            {/* Login Button */}
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-purple-600 to-pink-400"
@@ -122,8 +137,11 @@ const Login = () => {
 
         <CardFooter>
           <Button variant="outline" className="w-full" asChild>
-            <Link to="/signup">
-              <UserPlus size={16} className="mr-1" />
+            <Link
+              to="/signup"
+              className="flex items-center justify-center gap-1"
+            >
+              <UserPlus size={16} />
               Signup
             </Link>
           </Button>

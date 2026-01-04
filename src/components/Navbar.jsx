@@ -1,64 +1,77 @@
-import { ShoppingCart } from "lucide-react";
 import React from "react";
+import { ShoppingCart } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "./ui/button";
+import axios from "axios";
+import { toast } from "sonner";
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "@/redux/userSlice";
 
 const Navbar = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
-  // temporary user (replace later with auth context)
-  const user = true;
-  const cartCount = 2;
+  // 🔥 get full user slice
+  const userState = useSelector((state) => state.user);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token"); // clear auth
-    navigate("/login"); // redirect
+  // ✅ 2️⃣ YAHIN console.log karo
+  console.log("Navbar Redux userState 👉", userState);
+
+  // optional: safe user parse
+  let user = userState.user;
+  if (typeof user === "string") {
+    try {
+      user = JSON.parse(user);
+    } catch {
+      user = null;
+    }
+  }
+
+  const cartCount = 0;
+
+  const logoutHandler = async () => {
+    try {
+      await axios.post(
+        "http://localhost:5000/api/users/logout",
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+    } catch (err) {
+      console.log("Logout error:", err.response?.data || err.message);
+    } finally {
+      dispatch(logout());
+      toast.success("Logged out successfully");
+      navigate("/login");
+    }
   };
 
   return (
     <header className="bg-purple-50 fixed w-full z-20 border-b border-purple-200">
       <div className="max-w-7xl mx-auto flex justify-between items-center py-3 px-4">
-
+        
         {/* Logo */}
         <div
           onClick={() => navigate("/")}
-          className="flex flex-col items-center justify-center cursor-pointer"
+          className="flex items-center gap-2 bg-gradient-to-r from-pink-400 to-purple-500 text-white rounded-2xl px-4 py-1 cursor-pointer"
         >
-          <img
-            className="w-[90px] drop-shadow-md"
-            src="/6320340.png"
-            alt="E-Cart Logo"
-          />
-          <h2 className="-mt-3 text-lg font-bold tracking-wide text-purple-700">
-            E-Cart
-          </h2>
+          <img src="/6320340.png" className="w-[40px]" alt="logo" />
+          <h2 className="text-lg font-bold">E-Cart</h2>
         </div>
 
         {/* Navigation */}
-        <nav className="flex gap-10 items-center">
-          <ul className="flex gap-7 items-center text-lg font-semibold">
-            <li>
-              <Link to="/" className="hover:text-purple-600">
-                Home
-              </Link>
-            </li>
+        <nav className="flex gap-6 items-center">
+          <Link to="/" className="font-semibold hover:text-purple-600">
+            Home
+          </Link>
 
-            <li>
-              <Link to="/products" className="hover:text-purple-600">
-                Products
-              </Link>
-            </li>
+          <Link to="/products" className="font-semibold hover:text-purple-600">
+            Products
+          </Link>  
 
-            {user && (
-              <li>
-                <Link to="/profile" className="hover:text-purple-600">
-                  Hello User
-                </Link>
-              </li>
-            )}
-          </ul>
-
-          {/* Cart */}
           <Link to="/cart" className="relative">
             <ShoppingCart className="w-6 h-6" />
             {cartCount > 0 && (
@@ -68,14 +81,19 @@ const Navbar = () => {
             )}
           </Link>
 
-          {/* Login / Logout */}
+          {/* Auth Section */}
           {user ? (
-            <Button
-              onClick={handleLogout}
-              className="bg-gradient-to-r from-purple-600 to-pink-500 text-white"
-            >
-              Logout
-            </Button>
+            <>
+              <span onClick={() => navigate("/profile")} className="text-purple-700 font-semibold cursor-pointer hover:bg-pink-200 p-2 rounded-tl-3xl rounded-br-2xl">
+                Hello {user.FirstName} {user.LastName}
+              </span>
+              <Button
+                onClick={logoutHandler}
+                className="bg-gradient-to-r from-purple-600 to-pink-500 text-white"
+              >
+                Logout
+              </Button>
+            </>
           ) : (
             <Button
               onClick={() => navigate("/login")}
