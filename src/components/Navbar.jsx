@@ -6,28 +6,24 @@ import axios from "axios";
 import { toast } from "sonner";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "@/redux/userSlice";
+import { clearCart } from "@/redux/cartSlice";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  // 🔥 get full user slice
-  const userState = useSelector((state) => state.user);
+  const { user, accessToken } = useSelector((state) => state.user);
+ const cart = useSelector(state => state.cart);
+console.log("🛒 CART REDUX 👉", cart);
 
-  // ✅ 2️⃣ YAHIN console.log karo
-  console.log("Navbar Redux userState 👉", userState);
+  // ✅ SAFE cart read
+  const { items = [] } = useSelector((state) => state.cart || {});
 
-  // optional: safe user parse
-  let user = userState.user;
-  if (typeof user === "string") {
-    try {
-      user = JSON.parse(user);
-    } catch {
-      user = null;
-    }
-  }
-
-  const cartCount = 0;
+  // ✅ SAFE count
+  const cartCount = items.reduce(
+    (total, item) => total + (item.quantity || 1),
+    0
+  );
 
   const logoutHandler = async () => {
     try {
@@ -41,9 +37,10 @@ const Navbar = () => {
         }
       );
     } catch (err) {
-      console.log("Logout error:", err.response?.data || err.message);
+      console.log("Logout error:", err.message);
     } finally {
       dispatch(logout());
+      dispatch(clearCart());
       toast.success("Logged out successfully");
       navigate("/login");
     }
@@ -51,8 +48,8 @@ const Navbar = () => {
 
   return (
     <header className="bg-purple-50 fixed w-full z-20 border-b border-purple-200">
-      <div className="max-w-7xl mx-auto flex justify-between items-center py-3 px-4">
-        
+      <div className="max-w-full mx-auto flex justify-between items-center py-3 px-8">
+
         {/* Logo */}
         <div
           onClick={() => navigate("/")}
@@ -70,23 +67,31 @@ const Navbar = () => {
 
           <Link to="/products" className="font-semibold hover:text-purple-600">
             Products
-          </Link>  
-
-          <Link to="/cart" className="relative">
-            <ShoppingCart className="w-6 h-6" />
-            {cartCount > 0 && (
-              <span className="absolute -top-2 -right-2 bg-yellow-500 text-white text-xs px-2 rounded-full">
-                {cartCount}
-              </span>
-            )}
           </Link>
 
-          {/* Auth Section */}
+          {/* Cart */}
+    <Link to="/cart" className="relative">
+  <ShoppingCart className="w-6 h-6" />
+  <span
+    className={`absolute -top-2 -right-2 text-white text-xs px-2 rounded-full
+      ${cartCount === 0 ? "bg-gray-400" : "bg-yellow-500"}
+    `}
+  >
+    {cartCount}
+  </span>
+</Link>
+
+
+          {/* Auth */}
           {user ? (
             <>
-              <span onClick={() => navigate("/profile")} className="text-purple-700 font-semibold cursor-pointer hover:bg-pink-200 p-2 rounded-tl-3xl rounded-br-2xl">
+              <span
+                onClick={() => navigate("/profile")}
+                className="text-purple-700 font-semibold cursor-pointer hover:bg-pink-200 p-2 rounded-tl-2xl rounded-br-2xl"
+              >
                 Hello {user.FirstName} {user.LastName}
               </span>
+
               <Button
                 onClick={logoutHandler}
                 className="bg-gradient-to-r from-purple-600 to-pink-500 text-white"

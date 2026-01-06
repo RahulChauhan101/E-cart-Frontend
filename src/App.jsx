@@ -1,4 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
 import Home from "./pages/home";
 import Signup from "./pages/signup";
@@ -23,7 +24,7 @@ const router = createBrowserRouter([
   { path: "/login", element: <Login /> },
   { path: "/verify", element: <Verify /> },
   { path: "/verify/:token", element: <VerifyEmail /> },
-  { path: "/profile", element:<><Profile /> </>},
+  { path: "/profile", element:<> <Navbar/> <Profile/>   </>},
 ]);
 
 function App() {

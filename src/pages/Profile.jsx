@@ -1,275 +1,193 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useSelector } from "react-redux";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Profile = () => {
-  const accessToken = useSelector((state) => state.user?.accessToken);
-
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [edit, setEdit] = useState(false);
-  const [image, setImage] = useState(null);
-const [preview, setPreview] = useState("");
-
-
+  // ✅ FORM STATE (backend-ready)
   const [formData, setFormData] = useState({
-    phoneNumber: "",
+    firstName: "",
+    lastName: "",
+    email: "rahul@email.com",
+    phone: "",
     address: "",
     city: "",
-    country: "",
+    pinCode: "",
   });
-const handleImage = (e) => {
-  const file = e.target.files[0];
-  console.log("SELECTED FILE 👉", file);
-  setImage(file);
-  setPreview(URL.createObjectURL(file));
-};
 
+  const [profileImage, setProfileImage] = useState(null);
 
-
-const uploadProfilePic = async () => {
-  if (!image) return;
-
-  const formData = new FormData();
-  formData.append("profilepic", image);
-
-  try {
-    const res = await axios.patch(
-      "http://localhost:5000/api/users/profile-pic",
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
-
-    if (res.data.success) {
-      setUser(res.data.user);
-      setPreview("");
-    }
-  } catch (error) {
-    console.error("Profile pic error:", error.response?.data);
-  }
-};
-
-  /* =====================
-     GET PROFILE
-  ===================== */
-  useEffect(() => {
-    if (!accessToken) {
-      setLoading(false);
-      return;
-    }
-
-    const fetchProfile = async () => {
-      try {
-        const res = await axios.get(
-          "http://localhost:5000/api/users/profile",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
-
-        if (res.data.success) {
-          setUser(res.data.user);
-          setFormData({
-            phoneNumber: res.data.user.phoneNumber || "",
-            address: res.data.user.address || "",
-            city: res.data.user.city || "",
-            country: res.data.user.country || "",
-          });
-        }
-      } catch (error) {
-        console.error("Profile fetch error:", error.response?.data);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProfile();
-  }, [accessToken]);
-
-  /* =====================
-     INPUT CHANGE
-  ===================== */
+  // ✅ INPUT CHANGE HANDLER
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  /* =====================
-     UPDATE PROFILE
-  ===================== */
-  const updateProfile = async () => {
-    try {
-      const res = await axios.patch(
-        "http://localhost:5000/api/users/profile",
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-
-      if (res.data.success) {
-        setUser(res.data.user);
-        setEdit(false);
-      }
-    } catch (error) {
-      console.error("Profile update error:", error.response?.data);
-    }
+  // ✅ IMAGE CHANGE HANDLER
+  const handleImageChange = (e) => {
+    setProfileImage(e.target.files[0]);
   };
 
-  /* =====================
-     UI STATES
-  ===================== */
-  if (loading) return <div className="p-6">Loading profile...</div>;
-  if (!accessToken)
-    return <div className="p-6 text-red-500">User not logged in</div>;
-  if (!user) return <div className="p-6">No profile data</div>;
+  // ✅ SUBMIT (backend later)
+  const handleSubmit = (e) => {
+    e.preventDefault();
 
-  /* =====================
-     UI
-  ===================== */
+    // 🔗 Later: API call yahin lagegi
+    console.log("FORM DATA 👉", formData);
+    console.log("IMAGE 👉", profileImage);
+  };
+
   return (
-    <div className="pt-24 min-h-screen bg-gradient-to-br from-purple-100 to-indigo-100">
-      <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-2xl p-8">
-        
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-purple-600">
-            My Profile
-          </h2>
+    <div className="pt-20 max-h-full bg-gray-100">
+      <Tabs defaultValue="profile" className="w-full max-w-7xl mx-auto">
 
-          <button
-            onClick={() => setEdit(!edit)}
-            className="px-4 py-2 rounded bg-purple-500 text-white hover:bg-purple-600 transition"
-          >
-            {edit ? "Cancel" : "Edit"}
-          </button>
+        {/* Tabs Header */}
+        <div className="flex justify-center ">
+          <TabsList className="grid grid-cols-2 bg-white shadow-md">
+            <TabsTrigger value="profile">Profile</TabsTrigger>
+            <TabsTrigger value="orders">Orders</TabsTrigger>
+          </TabsList>
         </div>
-        <div className="flex flex-col items-center mb-6">
-  <img
-    src={preview || user.profilepic || "/avatar.png"}
-    alt="profile"
-    className="w-28 h-28 rounded-full object-cover border-4 border-purple-400"
-  />
 
-  <input
-    type="file"
-    accept="image/*"
-    onChange={handleImage}
-    className="mt-3 text-sm"
-  />
+        {/* PROFILE TAB */}
+        <TabsContent value="profile">
+          <div className="flex flex-col items-center bg-pink-200 border rounded-3xl pb-3">
+            <h1 className="font-bold mb-3 mt-3 text-2xl text-gray-800">
+              Update Profile
+            </h1>
 
-  {preview && (
-    <button
-      onClick={uploadProfilePic}
-      className="mt-2 px-4 py-1 bg-purple-500 text-white rounded"
-    >
-      Upload
-    </button>
-  )}
-</div>
+            <div className="w-full flex gap-10 justify-between items-start px-7 max-w-3xl">
+              {/* Profile Picture */}
+              <div className="flex flex-col items-center">
+                <img
+                  src="/istockphoto-1324380506-2048x2048.jpg"
+                  alt="profile"
+                  className="h-32 rounded-full object-cover border-4 border-pink-500 p-1"
+                />
+                <Label className="mt-4 cursor-pointer bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700">
+                  Change picture
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleImageChange}
+                  />
+                </Label>
+              </div>
 
+              {/* Profile Form */}
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-4 shadow-lg p-6 rounded-lg bg-white w-full"
+              >
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label>First Name</Label>
+                    <Input
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      placeholder="Rahul"
+                    />
+                  </div>
+                  <div>
+                    <Label>Last Name</Label>
+                    <Input
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      placeholder="Chauhan"
+                    />
+                  </div>
+                </div>
 
-        {/* VIEW MODE */}
-        {!edit && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-gray-700">
-            <ProfileItem label="First Name" value={user.FirstName} />
-            <ProfileItem label="Last Name" value={user.LastName} />
-            <ProfileItem label="Email" value={user.email} />
-            <ProfileItem label="Role" value={user.role} />
-            <ProfileItem
-              label="Verified"
-              value={user.isverified ? "Yes" : "No"}
-            />
-            <ProfileItem
-              label="Phone"
-              value={user.phoneNumber || "Not Added"}
-            />
-            <ProfileItem
-              label="City"
-              value={user.city || "Not Added"}
-            />
-            <ProfileItem
-              label="Country"
-              value={user.country || "Not Added"}
-            />
-            <div className="md:col-span-2">
-              <ProfileItem
-                label="Address"
-                value={user.address || "Not Added"}
-              />
+                <div>
+                  <Label>Email</Label>
+                  <Input value={formData.email} disabled />
+                </div>
+
+                <div>
+                  <Label>Phone Number</Label>
+                  <Input
+                    name="phone"
+                    value={formData.phone}
+                    onChange={handleChange}
+                    placeholder="Enter your Contact Number"
+                  />
+                </div>
+
+                <div>
+                  <Label>Address</Label>
+                  <Input
+                    name="address"
+                    value={formData.address}
+                    onChange={handleChange}
+                    placeholder="Enter your Address"
+                  />
+                </div>
+
+                <div>
+                  <Label>City</Label>
+                  <Input
+                    name="city"
+                    value={formData.city}
+                    onChange={handleChange}
+                    placeholder="Enter your City"
+                  />
+                </div>
+
+                <div>
+                  <Label>Pin Code</Label>
+                  <Input
+                    name="pinCode"
+                    value={formData.pinCode}
+                    onChange={handleChange}
+                    placeholder="Enter your Pin Code"
+                  />
+                </div>
+
+                <Button
+                  type="submit"
+                  className="w-full mt-4 bg-pink-700 hover:bg-pink-800"
+                >
+                  Update Profile
+                </Button>
+              </form>
             </div>
           </div>
-        )}
+        </TabsContent>
 
-        {/* EDIT MODE */}
-        {edit && (
-          <div className="space-y-4">
-            <Input
-              label="Phone Number"
-              name="phoneNumber"
-              value={formData.phoneNumber}
-              onChange={handleChange}
-            />
-            <Input
-              label="City"
-              name="city"
-              value={formData.city}
-              onChange={handleChange}
-            />
-            <Input
-              label="Country"
-              name="country"
-              value={formData.country}
-              onChange={handleChange}
-            />
-            <Input
-              label="Address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-            />
+        {/* ORDERS TAB */}
+        <TabsContent value="orders">
+          <Card className="max-w-xl mx-auto">
+            <CardHeader>
+              <CardTitle>Orders</CardTitle>
+              <CardDescription>
+                Your recent orders will appear here.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-gray-500 text-sm">
+                No orders found.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-            <button
-              onClick={updateProfile}
-              className="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 transition"
-            >
-              Save Changes
-            </button>
-          </div>
-        )}
-      </div>
+      </Tabs>
     </div>
   );
 };
-
-/* =====================
-   SMALL COMPONENTS
-===================== */
-const ProfileItem = ({ label, value }) => (
-  <div>
-    <p className="text-sm text-gray-400">{label}</p>
-    <p className="font-medium text-gray-800">{value}</p>
-  </div>
-);
-
-const Input = ({ label, ...props }) => (
-  <div>
-    <label className="text-sm text-gray-500">{label}</label>
-    <input
-      {...props}
-      className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-purple-400"
-    />
-  </div>
-);
 
 export default Profile;
