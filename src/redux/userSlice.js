@@ -5,6 +5,7 @@ const initialState = {
   accessToken: null,
   refreshToken: null,
   isAuthenticated: false,
+  authCheked: false,
 };
 
 const userSlice = createSlice({
@@ -12,10 +13,19 @@ const userSlice = createSlice({
   initialState,
   reducers: {
     loginSuccess: (state, action) => {
-      state.user = action.payload.user; // ✅ OBJECT ONLY
+      state.user = action.payload.user;
       state.accessToken = action.payload.accessToken;
       state.refreshToken = action.payload.refreshToken;
       state.isAuthenticated = true;
+    },
+
+    updateUser: (state, action) => {
+      state.user = {
+        ...state.user,
+        ...action.payload,
+      };
+      state.isAuthenticated = true;
+      state.authCheked = true;
     },
 
     logout: (state) => {
@@ -27,5 +37,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { loginSuccess, logout } = userSlice.actions;
+export const { loginSuccess, logout, updateUser } = userSlice.actions;
 export default userSlice.reducer;

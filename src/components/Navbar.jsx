@@ -15,6 +15,7 @@ const Navbar = () => {
   const { user, accessToken } = useSelector((state) => state.user);
  const cart = useSelector(state => state.cart);
 console.log("🛒 CART REDUX 👉", cart);
+console.log("user profilepic:", user?.profilepic);
 
   // ✅ SAFE cart read
   const { items = [] } = useSelector((state) => state.cart || {});
@@ -91,6 +92,26 @@ console.log("🛒 CART REDUX 👉", cart);
               >
                 Hello {user.FirstName} {user.LastName}
               </span>
+  {/* Profile Image */}
+
+<img
+  src={
+    user?.profilepic && user.profilepic.trim() !== ""
+      ? user.profilepic
+      : "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+  }
+  alt="profile"
+  onClick={() => navigate("/profile")}
+  onError={(e) => {
+    e.currentTarget.src =
+      "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+  }}
+  className="w-10 h-10 rounded-full object-cover border-2 border-purple-500 cursor-pointer hover:scale-105 transition"
+/>
+
+
+
+              
 
               <Button
                 onClick={logoutHandler}

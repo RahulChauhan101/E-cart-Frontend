@@ -1,22 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSelector,  useDispatch } from "react-redux";
+import { updateUser } from "@/redux/userSlice";
+
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Profile = () => {
-  // ✅ FORM STATE (backend-ready)
+  const { accessToken, user } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "rahul@email.com",
+    email: "",
     phone: "",
     address: "",
     city: "",
@@ -24,198 +22,170 @@ const Profile = () => {
   });
 
   const [profileImage, setProfileImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // ✅ INPUT CHANGE HANDLER
+  // ✅ Prefill
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        firstName: user.FirstName || "",
+        lastName: user.LastName || "",
+        email: user.email || "",
+        phone: user.phoneNumber || "",
+        address: user.address || "",
+        city: user.city || "",
+        pinCode: user.zipcode || "",
+      });
+
+      if (user.profilepic) {
+        setImagePreview(user.profilepic);
+      }
+    }
+  }, [user]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ✅ IMAGE CHANGE HANDLER
+  // ✅ Image handler + preview
   const handleImageChange = (e) => {
-    setProfileImage(e.target.files[0]);
+    const file = e.target.files[0];
+    if (file) {
+      setProfileImage(file);
+      setImagePreview(URL.createObjectURL(file));
+    }
   };
 
-  // ✅ SUBMIT (backend later)
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  const data = new FormData();
-  data.append("firstName", formData.firstName);
-  data.append("lastName", formData.lastName);
-  data.append("phone", formData.phone);
-  data.append("address", formData.address);
-  data.append("city", formData.city);
-  data.append("pinCode", formData.pinCode);
+    if (!accessToken) return alert("Not logged in");
 
-  if (profileImage) {
-    data.append("file", profileImage);
-  }
+    const data = new FormData();
+    Object.entries(formData).forEach(([key, value]) =>
+      data.append(key, value)
+    );
 
-  try {
-const res = await fetch(
-  "http://localhost:5000/api/users/update-profile",
-  {
-    method: "PUT",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-    body: data,
-  }
-);
+    if (profileImage) {
+      data.append("profilepic", profileImage);
+    }
 
+    try {
+      setLoading(true);
 
-    const result = await res.json();
-    console.log(result);
-    alert("Profile updated successfully");
-  } catch (error) {
-    console.error(error);
-  }
-};
+      const res = await fetch(
+        "http://localhost:5000/api/users/update-profile",
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: data,
+        }
+      );
 
+      const result = await res.json();
+
+      if (!res.ok) {
+        alert(result.message || "Update failed");
+        return;
+      }
+
+      dispatch(updateUser(result.user));
+      console.log("updateuser fn:",updateUser);
+      
+
+      alert("Profile updated successfully ✅");
+      console.log("UPDATED USER:", result.user);
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
+    <div className="pt-20 bg-gray-100 min-h-screen">
+      <Tabs defaultValue="profile" className="max-w-5xl mx-auto">
+        <TabsList className="grid grid-cols-2 bg-white shadow-md rounded-xl">
+          <TabsTrigger value="profile">Profile</TabsTrigger>
+          <TabsTrigger value="orders">Orders</TabsTrigger>
+        </TabsList>
 
-    
-    <div className="pt-20 max-h-full bg-gray-100">
-      <Tabs defaultValue="profile" className="w-full max-w-7xl mx-auto">
-
-        {/* Tabs Header */}
-        <div className="flex justify-center ">
-          <TabsList className="grid grid-cols-2 bg-white shadow-md">
-            <TabsTrigger value="profile">Profile</TabsTrigger>
-            <TabsTrigger value="orders">Orders</TabsTrigger>
-          </TabsList>
-        </div>
-
-        {/* PROFILE TAB */}
         <TabsContent value="profile">
-          <div className="flex flex-col items-center bg-pink-200 border rounded-3xl pb-3">
-            <h1 className="font-bold mb-3 mt-3 text-2xl text-gray-800">
-              Update Profile
-            </h1>
+          <div className="bg-white rounded-2xl p-8 mt-6 shadow-lg">
+            <h1 className="text-2xl font-bold mb-6">Update Profile</h1>
 
-            <div className="w-full flex gap-10 justify-between items-start px-7 max-w-3xl">
-              {/* Profile Picture */}
-              <div className="flex flex-col items-center">
-                <img
-                  src="/istockphoto-1324380506-2048x2048.jpg"
-                  alt="profile"
-                  className="h-32 rounded-full object-cover border-4 border-pink-500 p-1"
-                />
-                <Label className="mt-4 cursor-pointer bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700">
-                  Change picture
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleImageChange}
-                  />
-                </Label>
+            {/* 🔹 Profile Image */}
+            <div className="flex items-center gap-6 mb-8 ">
+
+<div className="w-28 h-28 rounded-full border-3 border-red-500 shadow-md bg-gray-200 flex items-center justify-center">
+  <div className="w-full h-full p-1 rounded-full overflow-hidden bg-white">
+    <img
+      src={imagePreview || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}
+      alt="profile"
+      className="w-full h-full object-cover rounded-full"
+    />
+  </div>
+</div>
+
+              
+              
+
+              <div>
+                <Label className="block mb-2">Change Profile Image</Label>
+                <Input type="file" accept="image/*" onChange={handleImageChange} />
+              </div>
+            </div>
+
+            {/* 🔹 Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label>First Name</Label>
+                  <Input name="firstName" value={formData.firstName} onChange={handleChange} />
+                </div>
+                <div>
+                  <Label>Last Name</Label>
+                  <Input name="lastName" value={formData.lastName} onChange={handleChange} />
+                </div>
               </div>
 
-              {/* Profile Form */}
-              <form
-                onSubmit={handleSubmit}
-                className="space-y-4 shadow-lg p-6 rounded-lg bg-white w-full"
-              >
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label>First Name</Label>
-                    <Input
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      placeholder="Rahul"
-                    />
-                  </div>
-                  <div>
-                    <Label>Last Name</Label>
-                    <Input
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      placeholder="Chauhan"
-                    />
-                  </div>
-                </div>
+              <div>
+                <Label>Email</Label>
+                <Input value={formData.email} disabled />
+              </div>
 
-                <div>
-                  <Label>Email</Label>
-                  <Input value={formData.email} disabled />
-                </div>
+              <div>
+                <Label>Phone</Label>
+                <Input name="phone" value={formData.phone} onChange={handleChange} />
+              </div>
 
-                <div>
-                  <Label>Phone Number</Label>
-                  <Input
-                    name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="Enter your Contact Number"
-                  />
-                </div>
+              <div>
+                <Label>Address</Label>
+                <Input name="address" value={formData.address} onChange={handleChange} />
+              </div>
 
-                <div>
-                  <Label>Address</Label>
-                  <Input
-                    name="address"
-                    value={formData.address}
-                    onChange={handleChange}
-                    placeholder="Enter your Address"
-                  />
-                </div>
-
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label>City</Label>
-                  <Input
-                    name="city"
-                    value={formData.city}
-                    onChange={handleChange}
-                    placeholder="Enter your City"
-                  />
+                  <Input name="city" value={formData.city} onChange={handleChange} />
                 </div>
-
                 <div>
                   <Label>Pin Code</Label>
-                  <Input
-                    name="pinCode"
-                    value={formData.pinCode}
-                    onChange={handleChange}
-                    placeholder="Enter your Pin Code"
-                  />
+                  <Input name="pinCode" value={formData.pinCode} onChange={handleChange} />
                 </div>
+              </div>
 
-                <Button
-                  type="submit"
-                  className="w-full mt-4 bg-pink-700 hover:bg-pink-800"
-                >
-                  Update Profile
-                </Button>
-              </form>
-            </div>
+              <Button type="submit" disabled={loading} className="w-full mt-4">
+                {loading ? "Updating..." : "Update Profile"}
+              </Button>
+            </form>
           </div>
         </TabsContent>
-
-        {/* ORDERS TAB */}
-        <TabsContent value="orders">
-          <Card className="max-w-xl mx-auto">
-            <CardHeader>
-              <CardTitle>Orders</CardTitle>
-              <CardDescription>
-                Your recent orders will appear here.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-gray-500 text-sm">
-                No orders found.
-              </p>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
       </Tabs>
     </div>
   );

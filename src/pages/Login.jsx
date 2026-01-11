@@ -46,6 +46,7 @@ const Login = () => {
           headers: {
             "Content-Type": "application/json",
           },
+          withCredentials: true,
         }
       );
 
@@ -65,7 +66,7 @@ if (res.data.success) {
     autoClose: 2000,
   });
 
-  navigate("/");
+  navigate(`/profile`); // ✅ correct navigation
 }
     } catch (err) {
       toast.update(toastId, {

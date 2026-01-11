@@ -1,48 +1,26 @@
-// redux/store.js
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
-import userReducer from "./userSlice";
-import cartReucer from "./cartSlice";
+import { configureStore } from "@reduxjs/toolkit";
+import userReducer from "./userSlice"; // आपका स्लाइस
+import storage from "redux-persist/lib/storage"; // default: localStorage
+import { persistReducer, persistStore } from "redux-persist";
+import { combineReducers } from "redux";
 
-import {
-  persistReducer,
-  FLUSH,
-  REHYDRATE,
-  PAUSE,
-  PERSIST,
-  PURGE,
-  REGISTER,
-} from "redux-persist";
-
-import storage from "redux-persist/lib/storage";
-import { persistStore } from "redux-persist";
-import { cleanTransform } from "./cleanTransform"; // 👈 import
-
-/* Persist only user slice */
-const userPersistConfig = {
-  key: "user",
+const persistConfig = {
+  key: "root",
   storage,
-  transforms: [cleanTransform], // 👈 HERE
+  whitelist: ["user"], // सिर्फ 'user' स्लाइस को सेव करेगा
 };
 
 const rootReducer = combineReducers({
-  user: persistReducer(userPersistConfig, userReducer),
-  cart: cartReucer,
+  user: userReducer,
 });
 
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
 export const store = configureStore({
-  reducer: rootReducer,
+  reducer: persistedReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [
-          FLUSH,
-          REHYDRATE,
-          PAUSE,
-          PERSIST,
-          PURGE,
-          REGISTER,
-        ],
-      },
+      serializableCheck: false, // Redux Persist के लिए इसे false करना जरूरी है
     }),
 });
 
