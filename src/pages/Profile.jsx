@@ -40,15 +40,46 @@ const Profile = () => {
   };
 
   // ✅ SUBMIT (backend later)
-  const handleSubmit = (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    // 🔗 Later: API call yahin lagegi
-    console.log("FORM DATA 👉", formData);
-    console.log("IMAGE 👉", profileImage);
-  };
+  const data = new FormData();
+  data.append("firstName", formData.firstName);
+  data.append("lastName", formData.lastName);
+  data.append("phone", formData.phone);
+  data.append("address", formData.address);
+  data.append("city", formData.city);
+  data.append("pinCode", formData.pinCode);
+
+  if (profileImage) {
+    data.append("file", profileImage);
+  }
+
+  try {
+const res = await fetch(
+  "http://localhost:5000/api/users/update-profile",
+  {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem("token")}`,
+    },
+    body: data,
+  }
+);
+
+
+    const result = await res.json();
+    console.log(result);
+    alert("Profile updated successfully");
+  } catch (error) {
+    console.error(error);
+  }
+};
+
 
   return (
+
+    
     <div className="pt-20 max-h-full bg-gray-100">
       <Tabs defaultValue="profile" className="w-full max-w-7xl mx-auto">
 
