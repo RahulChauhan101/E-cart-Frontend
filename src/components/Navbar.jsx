@@ -13,9 +13,9 @@ const Navbar = () => {
   const dispatch = useDispatch();
 
   const { user, accessToken } = useSelector((state) => state.user);
- const cart = useSelector(state => state.cart);
-console.log("🛒 CART REDUX 👉", cart);
-console.log("user profilepic:", user?.profilepic);
+  const cart = useSelector((state) => state.cart);
+  console.log("🛒 CART REDUX 👉", cart);
+  console.log("user profilepic:", user?.profilepic);
 
   // ✅ SAFE cart read
   const { items = [] } = useSelector((state) => state.cart || {});
@@ -50,7 +50,6 @@ console.log("user profilepic:", user?.profilepic);
   return (
     <header className="bg-purple-50 fixed w-full z-20 border-b border-purple-200">
       <div className="max-w-full mx-auto flex justify-between items-center py-3 px-8">
-
         {/* Logo */}
         <div
           onClick={() => navigate("/")}
@@ -71,17 +70,16 @@ console.log("user profilepic:", user?.profilepic);
           </Link>
 
           {/* Cart */}
-    <Link to="/cart" className="relative">
-  <ShoppingCart className="w-6 h-6" />
-  <span
-    className={`absolute -top-2 -right-2 text-white text-xs px-2 rounded-full
+          <Link to="/cart" className="relative">
+            <ShoppingCart className="w-6 h-6" />
+            <span
+              className={`absolute -top-2 -right-2 text-white text-xs px-2 rounded-full
       ${cartCount === 0 ? "bg-gray-400" : "bg-yellow-500"}
     `}
-  >
-    {cartCount}
-  </span>
-</Link>
-
+            >
+              {cartCount}
+            </span>
+          </Link>
 
           {/* Auth */}
           {user ? (
@@ -92,30 +90,33 @@ console.log("user profilepic:", user?.profilepic);
               >
                 Hello {user.FirstName} {user.LastName}
               </span>
-  {/* Profile Image */}
+              {/* Profile Image */}
 
-<img
-  src={
-    user?.profilepic && user.profilepic.trim() !== ""
-      ? user.profilepic
-      : "https://cdn-icons-png.flaticon.com/512/847/847969.png"
-  }
-  alt="profile"
-  onClick={() => navigate("/profile")}
-  onError={(e) => {
-    e.currentTarget.src =
-      "https://cdn-icons-png.flaticon.com/512/847/847969.png";
-  }}
-  className="w-10 h-10 rounded-full object-cover border-2 border-purple-500 cursor-pointer hover:scale-105 transition"
-/>
-
-
-
-              
+              <img
+                src={
+                  user?.profilepic && user.profilepic.trim() !== ""
+                    ? user.profilepic
+                    : "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+                }
+                alt="profile"
+                onClick={() => navigate("/profile")}
+                onError={(e) => {
+                  e.currentTarget.src =
+                    "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+                }}
+                className="w-15 h-15 rounded-full object-cover border-2 border-purple-500 cursor-pointer hover:scale-115 transition p-0.5"
+              />
 
               <Button
                 onClick={logoutHandler}
-                className="bg-gradient-to-r from-purple-600 to-pink-500 text-white"
+                className="bg-gradient-to-r from-purple-600 to-pink-500
+                 text-white cursor-pointer             hover:scale-105
+    transition-all-duration-300
+    hover:shadow-lg
+    hover:shadow-purple-500/60
+
+
+                "
               >
                 Logout
               </Button>

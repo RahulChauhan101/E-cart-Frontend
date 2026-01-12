@@ -122,8 +122,8 @@ const Profile = () => {
             {/* 🔹 Profile Image */}
             <div className="flex items-center gap-6 mb-8 ">
 
-<div className="w-28 h-28 rounded-full border-3 border-red-500 shadow-md bg-gray-200 flex items-center justify-center">
-  <div className="w-full h-full p-1 rounded-full overflow-hidden bg-white">
+<div className="w-28 h-28 rounded-full bg-gradient-to-r from-pink-400 to-purple-500 p-1 shadow-md">
+  <div className="w-full h-full rounded-full bg-white overflow-hidden p-1">
     <img
       src={imagePreview || "https://cdn-icons-png.flaticon.com/512/847/847969.png"}
       alt="profile"
@@ -131,6 +131,7 @@ const Profile = () => {
     />
   </div>
 </div>
+
 
               
               
