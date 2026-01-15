@@ -8,6 +8,8 @@ import Verify from "./pages/Verify";
 import VerifyEmail from "./pages/VerifyEmail";
 import Footer from "./components/Footer";
 import Profile from "./pages/Profile";
+import Products from "./pages/Products";
+import Cart from "./pages/Cart";
 
 const router = createBrowserRouter([
   {
@@ -25,6 +27,8 @@ const router = createBrowserRouter([
   { path: "/verify", element: <Verify /> },
   { path: "/verify/:token", element: <VerifyEmail /> },
   { path: "/profile", element:<> <Navbar/> <Profile/>   </>},
+  { path: "/products", element:<> <Navbar/> <Products/>   </>},
+  { path: "/cart", element:<> <Navbar/> <Cart/>   </>},
 ]);
 
 function App() {
