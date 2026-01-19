@@ -18,7 +18,7 @@ const Navbar = () => {
   console.log("user profilepic:", user?.profilepic);
 
   // ✅ SAFE cart read
-  const { items = [] } = useSelector((state) => state.cart || {});
+const items = cart?.items || [];
 
   // ✅ SAFE count
   const cartCount = items.reduce(
