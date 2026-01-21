@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/redux/cartSlice";
+import { toast } from "react-toastify";
 
 const ProductCard = ({ item }) => {
   const dispatch = useDispatch();
@@ -107,6 +108,7 @@ const ProductCard = ({ item }) => {
       <button
         onClick={() => {
           dispatch(addToCart(item));
+          toast.success(`"${item.productname}" added to cart`);
           console.log("Added to cart:", item);
         }}
         className="mt-4 w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition"

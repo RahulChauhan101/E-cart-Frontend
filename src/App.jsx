@@ -10,6 +10,9 @@ import Footer from "./components/Footer";
 import Profile from "./pages/Profile";
 import Products from "./pages/Products";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import OrderSuccess from "./pages/OrderSuccess";
+
 
 const router = createBrowserRouter([
   {
@@ -29,6 +32,8 @@ const router = createBrowserRouter([
   { path: "/profile", element:<> <Navbar/> <Profile/>   </>},
   { path: "/products", element:<> <Navbar/> <Products/>   </>},
   { path: "/cart", element:<> <Navbar/> <Cart/>   </>},
+  { path: "/checkout", element:<> <Navbar/> <Checkout/>   </>},
+  { path: "/order-success", element:<> <Navbar/> <OrderSuccess/>   </>},
 ]);
 
 function App() {
